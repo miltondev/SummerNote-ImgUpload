@@ -1,0 +1,121 @@
+﻿@model ServerNote.Models.Info
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Scripts/summernote/summernote.css" rel="stylesheet" />
+
+
+<div class="panel panel-default">
+    <div class="panel-heading panel-head">Add Notes</div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+            {
+            <div class="form-horizontal">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Title, new { @class = "col-lg-2 control-label" })
+                    <div class="col-lg-9">
+                        @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Content, new { @class = "col-lg-2 control-label" })
+                    <div class="col-lg-9">
+                        
+                            @Html.TextAreaFor(model => model.Content, new { @class = "form-control note-codable summernote", @row = 5 })
+                            @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
+                    
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <div class="col-lg-9"></div>
+                    <div class="col-lg-3">
+                        <button class="btn btn-success" id="btnSubmit" type="submit">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section scripts{
+
+<script src="~/Scripts/summernote/summernote.js"></script>
+    <script>
+$(document).ready(function () {
+    $('.summernote').summernote({
+
+        minHeight: 400,
+        tabsize: 2,
+        disableDragAndDrop: false,
+        dialogsInBody: true,
+        dialogsFade: true,
+        ace: {
+            aceTheme: 'ace/theme/dawn',
+            aceMode: 'c_cpp',
+            aceLineHeight: '32px',
+            aceFontSize: '16px',
+            aceModeSelectorLabel: 'select your language',
+            aceCodeInputAreaLabel: 'input your code',
+            aceCodeSubmitBtnLabel: 'Insert',
+            aceModalTitle: 'Insert Code',
+            aceModes: [
+                'c/c++', 'java', 'javascript','css','html', 'perl', 'python', 'php', 'ruby',
+                'sh', 'golang', 'julia', 'rust', 'scala', 'haskell', 'lisp', 'lua', 'sql',
+                'coffee', 'typescript'
+            ],
+        },
+        codemirror: { // codemirror options
+            lineNumbers: true,
+            matchBrackets: true,
+            styleActiveLine: true,
+            theme: "ambiance"
+        },
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']],
+            ['myplugin', ['aceCodeEditor']]
+        ],
+
+        callbacks: {
+            onImageUpload: function (files, editor, welEditable) {
+                sendFile(files[0], editor, welEditable);
+            }
+        }
+    });
+});
+
+
+
+function sendFile(file, editor, welEditable) {
+    var data = new FormData();
+
+    data.append("file", file);
+    $.ajax({
+        data: data,
+        type: "POST",
+        processData: false,
+        contentType: false,
+        cache: false,
+        url: '/Note/UploadImages',
+        success: function (url) {
+            $('.summernote').summernote('insertImage', url);
+        }
+    });
+};
+
+</script>
+
+}
